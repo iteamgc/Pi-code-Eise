@@ -1,27 +1,26 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gewicht Controle</title>
-    <script>
-        function controleerGewicht() {
-            let gewicht = parseFloat(document.getElementById("gewicht").value);
-            let audio = new Audio('alert.mp3');
-            
-            if (gewicht > 5) {
-                audio.play();
-                let synth = window.speechSynthesis;
-                let utterance = new SpeechSynthesisUtterance("Gewicht is hoger dan 5 kilogram");
-                utterance.lang = "nl-NL";
-                synth.speak(utterance);
-            }
+const readline = require('readline');
+const player = require('play-sound')();
+const say = require('say');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function controleerGewicht() {
+    rl.question("Voer het gewicht in (kg): ", (input) => {
+        let gewicht = parseFloat(input);
+        if (gewicht > 5) {
+            console.log("Gewicht is hoger dan 5kg");
+            player.play('alert.mp3', (err) => {
+                if (err) console.error("Fout bij afspelen van geluid:", err);
+            });
+            say.speak("Gewicht is hoger dan 5 kilogram", "nl-NL");
+        } else {
+            console.log("Gewicht is binnen de limiet.");
         }
-    </script>
-</head>
-<body>
-    <h2>Voer het gewicht in (kg)</h2>
-    <input type="number" id="gewicht" step="0.1"> kg
-    <button onclick="controleerGewicht()">Controleer</button>
-</body>
-</html>
+        rl.close();
+    });
+}
+
+controleerGewicht();

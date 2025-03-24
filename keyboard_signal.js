@@ -1,47 +1,27 @@
-const Gpio = require('onoff').Gpio;
-const rpiGpio = require('rpi-gpio');
-const { exec } = require('child_process');
-
-// Define GPIO pins for LED and Buzzer
-const ledPin = new Gpio(17, 'out');
-const buzzerPin = new Gpio(27, 'out');
-
-// Function to emit light and sound
-function emitSignal() {
-  // Turn on LED
-  ledPin.writeSync(1);
-  // Turn on Buzzer
-  buzzerPin.writeSync(1);
-
-  // Turn off LED and Buzzer after 1 second
-  setTimeout(() => {
-    ledPin.writeSync(0);
-    buzzerPin.writeSync(0);
-  }, 1000);
-}
-
-// Function to handle key press
-function handleKeyPress() {
-  emitSignal();
-}
-
-// Set up GPIO pin for the keyboard input
-rpiGpio.on('change', (channel, value) => {
-  if (value) {
-    handleKeyPress();
-  }
-});
-
-rpiGpio.setup(7, rpiGpio.DIR_IN, rpiGpio.EDGE_BOTH);
-
-// Clean up GPIO on exit
-function exitHandler() {
-  ledPin.unexport();
-  buzzerPin.unexport();
-  process.exit();
-}
-
-process.on('SIGINT', exitHandler);
-process.on('SIGTERM', exitHandler);
-
-console.log('Press a key to emit signal...');
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gewicht Controle</title>
+    <script>
+        function controleerGewicht() {
+            let gewicht = parseFloat(document.getElementById("gewicht").value);
+            let audio = new Audio('alert.mp3');
+            
+            if (gewicht > 5) {
+                audio.play();
+                let synth = window.speechSynthesis;
+                let utterance = new SpeechSynthesisUtterance("Gewicht is hoger dan 5 kilogram");
+                utterance.lang = "nl-NL";
+                synth.speak(utterance);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Voer het gewicht in (kg)</h2>
+    <input type="number" id="gewicht" step="0.1"> kg
+    <button onclick="controleerGewicht()">Controleer</button>
+</body>
+</html>
